@@ -117,8 +117,7 @@ static iomux_v3_cfg_t const usdhc2_cd_pads[] = {
 };
 
 static iomux_v3_cfg_t const usdhc2_dat3_pads[] = {
-	MX6_PAD_NAND_DATA03__USDHC2_DATA3 |
-	MUX_PAD_CTRL(USDHC_DAT3_CD_PAD_CTRL),
+	MX6_PAD_NAND_DATA03__USDHC2_DATA3 | MUX_PAD_CTRL(USDHC_DAT3_CD_PAD_CTRL),
 };
 
 static void setup_iomux_uart(void)
@@ -131,8 +130,6 @@ static struct fsl_esdhc_cfg usdhc_cfg = {
 	USDHC2_BASE_ADDR, 0, 4,
 };
 
-#define USDHC1_CD_GPIO	IMX_GPIO_NR(1, 19)
-#define USDHC1_PWR_GPIO	IMX_GPIO_NR(1, 9)
 #define USDHC2_CD_GPIO	IMX_GPIO_NR(4, 5)
 #define USDHC2_PWR_GPIO	IMX_GPIO_NR(4, 10)
 
@@ -158,9 +155,6 @@ int board_mmc_getcd(struct mmc *mmc)
 	int ret = 0;
 
 	switch (cfg->esdhc_base) {
-	case USDHC1_BASE_ADDR:
-		ret = !gpio_get_value(USDHC1_CD_GPIO);
-		break;
 	case USDHC2_BASE_ADDR:
 		imx_iomux_v3_setup_multiple_pads(usdhc2_cd_pads,
 						 ARRAY_SIZE(usdhc2_cd_pads));
@@ -175,6 +169,9 @@ int board_mmc_getcd(struct mmc *mmc)
 		imx_iomux_v3_setup_multiple_pads(usdhc2_dat3_pads,
 						 ARRAY_SIZE(usdhc2_dat3_pads));
 		break;
+
+	default:
+		printf("error: unexpected esdhc_base\n");
 	}
 
 	return ret;
