@@ -231,7 +231,12 @@
 #define CONFIG_IMX_THERMAL
 
 #ifndef CONFIG_SPL_BUILD
-#define CONFIG_VIDEO
+/* Temporarily disable video */
+/* #define CONFIG_VIDEO */
+#ifdef CONFIG_VIDEO
+#undef CONFIG_VIDEO
+#endif
+
 #ifdef CONFIG_VIDEO
 #define CONFIG_CFB_CONSOLE
 #define CONFIG_VIDEO_MXS
