@@ -56,10 +56,12 @@
 #define CONFIG_MXC_UART_BASE		UART1_BASE
 
 /* MMC Configs */
-#ifdef CONFIG_FSL_USDHC
+#ifndef CONFIG_FSL_USDHC
+#error "i.MX6UL Densowave M30 boots from USDHC. Enable CONFIG_FSL_USDHC"
+#endif
+
 #define CONFIG_SYS_FSL_ESDHC_ADDR	USDHC2_BASE_ADDR
 #define CONFIG_SYS_FSL_USDHC_NUM	2
-#endif
 
 /* I2C configs */
 #define CONFIG_CMD_I2C
