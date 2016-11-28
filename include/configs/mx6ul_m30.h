@@ -34,13 +34,6 @@
 /* DCDC used, no PMIC */
 #undef CONFIG_LDO_BYPASS_CHECK
 
-/* SPL options */
-/* We default not support SPL
- * #define CONFIG_SPL_LIBCOMMON_SUPPORT
- * #define CONFIG_SPL_MMC_SUPPORT
- * #include "imx6_spl.h"
-*/
-
 #define CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
 
 #define CONFIG_DISPLAY_CPUINFO
@@ -230,7 +223,6 @@
 
 #define CONFIG_IMX_THERMAL
 
-#ifndef CONFIG_SPL_BUILD
 /* Temporarily disable video */
 /* #define CONFIG_VIDEO */
 #ifdef CONFIG_VIDEO
@@ -251,7 +243,6 @@
 #define CONFIG_VIDEO_BMP_RLE8
 #define CONFIG_VIDEO_BMP_LOGO
 #define CONFIG_IMX_VIDEO_SKIP
-#endif
 #endif
 
 #define CONFIG_MODULE_FUSE
