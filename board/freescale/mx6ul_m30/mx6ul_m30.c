@@ -313,20 +313,8 @@ int board_init(void)
 	return 0;
 }
 
-#ifdef CONFIG_CMD_BMODE
-static const struct boot_mode board_boot_modes[] = {
-	/* 4 bit bus width */
-	{"sd2", MAKE_CFGVAL(0x40, 0x28, 0x00, 0x00)},
-	{NULL,	 0},
-};
-#endif
-
 int board_late_init(void)
 {
-#ifdef CONFIG_CMD_BMODE
-	add_board_boot_modes(board_boot_modes);
-#endif
-
 #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
 	setenv("board_name", "DENSOWAVE");
 	setenv("board_rev", "M30");
