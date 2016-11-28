@@ -31,8 +31,8 @@
 
 #define PHYS_SDRAM_SIZE		SZ_256M
 #define CONFIG_BOOTARGS_CMA_SIZE   ""
-/* DCDC used, no PMIC */
-#undef CONFIG_LDO_BYPASS_CHECK
+
+#define CONFIG_LDO_BYPASS_CHECK
 
 #define CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
 
@@ -56,7 +56,11 @@
 #define CONFIG_SYS_FSL_ESDHC_ADDR	USDHC2_BASE_ADDR
 
 /* I2C configs */
-#define CONFIG_CMD_I2C
+/* #define CONFIG_CMD_I2C */
+#ifdef CONFIG_CMD_I2C
+#undef CONFIG_CMD_I2C
+#endif
+
 #ifdef CONFIG_CMD_I2C
 #define CONFIG_SYS_I2C
 #define CONFIG_SYS_I2C_MXC
@@ -196,7 +200,8 @@
 /* FLASH and environment organization */
 #define CONFIG_SYS_NO_FLASH
 
-#define CONFIG_ENV_IS_IN_MMC
+/* #define CONFIG_ENV_IS_IN_MMC */
+#define CONFIG_ENV_IS_NOWHERE
 
 #define CONFIG_SYS_MMC_ENV_DEV		1   /* USDHC2 */
 #define CONFIG_SYS_MMC_ENV_PART		0	/* user area */
@@ -206,7 +211,11 @@
 #define CONFIG_ENV_OFFSET		(12 * SZ_64K)
 
 /* USB Configs */
-#define CONFIG_CMD_USB
+/* #define CONFIG_CMD_USB */
+#ifdef CONFIG_CMD_USB
+#undef CONFIG_CMD_USB
+#endif
+
 #ifdef CONFIG_CMD_USB
 #define CONFIG_USB_EHCI
 #define CONFIG_USB_EHCI_MX6

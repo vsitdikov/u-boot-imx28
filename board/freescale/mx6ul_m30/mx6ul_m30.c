@@ -302,12 +302,16 @@ int board_init(void)
 	/* Address of boot parameters */
 	gd->bd->bi_boot_params = PHYS_SDRAM + 0x100;
 
+#if 0
 #ifdef CONFIG_SYS_I2C_MXC
 	setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info1);
 #endif
+#endif
 
+#if 0
 #ifdef CONFIG_USB_EHCI_MX6
 	setup_usb();
+#endif
 #endif
 
 	return 0;
@@ -327,10 +331,17 @@ int board_late_init(void)
 
 int checkboard(void)
 {
-	puts("Board: MX6UL 14x14 EVK\n");
+	puts("Board: MX6UL DensoWave M30\n");
 
 	return 0;
 }
+
+#ifdef CONFIG_LDO_BYPASS_CHECK
+void ldo_mode_set(int ldo_bypass)
+{
+	printf("No PMIC found!\n");
+}
+#endif
 
 #ifdef CONFIG_FSL_FASTBOOT
 void board_fastboot_setup(void)
