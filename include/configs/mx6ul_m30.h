@@ -31,15 +31,10 @@
 
 #define is_mx6ul_9x9_evk()	CONFIG_IS_ENABLED(TARGET_MX6UL_9X9_EVK)
 
-#ifdef CONFIG_TARGET_MX6UL_9X9_EVK
 #define PHYS_SDRAM_SIZE		SZ_256M
-#define CONFIG_BOOTARGS_CMA_SIZE   "cma=96M "
-#else
-#define PHYS_SDRAM_SIZE		SZ_512M
 #define CONFIG_BOOTARGS_CMA_SIZE   ""
 /* DCDC used on 14x14 EVK, no PMIC */
 #undef CONFIG_LDO_BYPASS_CHECK
-#endif
 
 /* SPL options */
 /* We default not support SPL
