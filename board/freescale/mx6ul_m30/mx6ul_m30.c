@@ -132,46 +132,26 @@ static struct fsl_esdhc_cfg usdhc_cfg = {
 
 #define USDHC2_CD_GPIO	IMX_GPIO_NR(4, 5)
 
-int board_mmc_get_env_dev(int devno)
-{
-	if (devno == 1 && mx6_esdhc_fused(USDHC1_BASE_ADDR))
-		devno = 0;
-
-	return devno;
-}
-
-int mmc_map_to_kernel_blk(int devno)
-{
-	if (devno == 0 && mx6_esdhc_fused(USDHC1_BASE_ADDR))
-		devno = 1;
-
-	return devno;
-}
-
 int board_mmc_getcd(struct mmc *mmc)
 {
 	struct fsl_esdhc_cfg *cfg = (struct fsl_esdhc_cfg *)mmc->priv;
 	int ret = 0;
 
-	switch (cfg->esdhc_base) {
-	case USDHC2_BASE_ADDR:
-		imx_iomux_v3_setup_multiple_pads(usdhc2_cd_pads,
-						 ARRAY_SIZE(usdhc2_cd_pads));
-		gpio_direction_input(USDHC2_CD_GPIO);
-
-		/*
-		 * Since it is the DAT3 pin, this pin is pulled to
-		 * low voltage if no card
-		 */
-		ret = gpio_get_value(USDHC2_CD_GPIO);
-
-		imx_iomux_v3_setup_multiple_pads(usdhc2_dat3_pads,
-						 ARRAY_SIZE(usdhc2_dat3_pads));
-		break;
-
-	default:
+	if (cfg->esdhc_base != USDHC2_BASE_ADDR) {
 		printf("error: unexpected esdhc_base\n");
+		return ret;
 	}
+
+	imx_iomux_v3_setup_multiple_pads(usdhc2_cd_pads, ARRAY_SIZE(usdhc2_cd_pads));
+	gpio_direction_input(USDHC2_CD_GPIO);
+
+	/*
+	 * Since it is the DAT3 pin, this pin is pulled to
+	 * low voltage if no card
+	 */
+	ret = gpio_get_value(USDHC2_CD_GPIO);
+
+	imx_iomux_v3_setup_multiple_pads(usdhc2_dat3_pads, ARRAY_SIZE(usdhc2_dat3_pads));
 
 	return ret;
 }
@@ -363,10 +343,6 @@ int board_late_init(void)
 #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
 	setenv("board_name", "DENSOWAVE");
 	setenv("board_rev", "M30");
-#endif
-
-#ifdef CONFIG_ENV_IS_IN_MMC
-	board_late_mmc_env_init();
 #endif
 
 	set_wdog_reset((struct wdog_regs *)WDOG1_BASE_ADDR);
