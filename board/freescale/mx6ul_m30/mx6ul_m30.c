@@ -407,10 +407,8 @@ int board_mmc_init(bd_t *bis)
 			gpio_direction_output(USDHC1_PWR_GPIO, 1);
 			break;
 		case 1:
-#ifndef CONFIG_SYS_USE_NAND
 			imx_iomux_v3_setup_multiple_pads(
 				usdhc2_pads, ARRAY_SIZE(usdhc2_pads));
-#endif
 			gpio_direction_output(USDHC2_PWR_GPIO, 0);
 			udelay(500);
 			gpio_direction_output(USDHC2_PWR_GPIO, 1);
@@ -468,42 +466,6 @@ int board_ehci_hcd_init(int port)
 	setbits_le32(usbnc_usb_ctrl, UCTRL_PWR_POL);
 
 	return 0;
-}
-#endif
-
-#ifdef CONFIG_NAND_MXS
-static iomux_v3_cfg_t const nand_pads[] = {
-	MX6_PAD_NAND_DATA00__RAWNAND_DATA00 | MUX_PAD_CTRL(GPMI_PAD_CTRL2),
-	MX6_PAD_NAND_DATA01__RAWNAND_DATA01 | MUX_PAD_CTRL(GPMI_PAD_CTRL2),
-	MX6_PAD_NAND_DATA02__RAWNAND_DATA02 | MUX_PAD_CTRL(GPMI_PAD_CTRL2),
-	MX6_PAD_NAND_DATA03__RAWNAND_DATA03 | MUX_PAD_CTRL(GPMI_PAD_CTRL2),
-	MX6_PAD_NAND_DATA04__RAWNAND_DATA04 | MUX_PAD_CTRL(GPMI_PAD_CTRL2),
-	MX6_PAD_NAND_DATA05__RAWNAND_DATA05 | MUX_PAD_CTRL(GPMI_PAD_CTRL2),
-	MX6_PAD_NAND_DATA06__RAWNAND_DATA06 | MUX_PAD_CTRL(GPMI_PAD_CTRL2),
-	MX6_PAD_NAND_DATA07__RAWNAND_DATA07 | MUX_PAD_CTRL(GPMI_PAD_CTRL2),
-	MX6_PAD_NAND_CLE__RAWNAND_CLE | MUX_PAD_CTRL(GPMI_PAD_CTRL2),
-	MX6_PAD_NAND_ALE__RAWNAND_ALE | MUX_PAD_CTRL(GPMI_PAD_CTRL2),
-	MX6_PAD_NAND_CE0_B__RAWNAND_CE0_B | MUX_PAD_CTRL(GPMI_PAD_CTRL2),
-	MX6_PAD_NAND_CE1_B__RAWNAND_CE1_B | MUX_PAD_CTRL(GPMI_PAD_CTRL2),
-	MX6_PAD_NAND_RE_B__RAWNAND_RE_B | MUX_PAD_CTRL(GPMI_PAD_CTRL2),
-	MX6_PAD_NAND_WE_B__RAWNAND_WE_B | MUX_PAD_CTRL(GPMI_PAD_CTRL2),
-	MX6_PAD_NAND_WP_B__RAWNAND_WP_B | MUX_PAD_CTRL(GPMI_PAD_CTRL2),
-	MX6_PAD_NAND_READY_B__RAWNAND_READY_B | MUX_PAD_CTRL(GPMI_PAD_CTRL2),
-	MX6_PAD_NAND_DQS__RAWNAND_DQS | MUX_PAD_CTRL(GPMI_PAD_CTRL2),
-};
-
-static void setup_gpmi_nand(void)
-{
-	struct mxc_ccm_reg *mxc_ccm = (struct mxc_ccm_reg *)CCM_BASE_ADDR;
-
-	/* config gpmi nand iomux */
-	imx_iomux_v3_setup_multiple_pads(nand_pads, ARRAY_SIZE(nand_pads));
-
-	setup_gpmi_io_clk((3 << MXC_CCM_CSCDR1_BCH_PODF_OFFSET) |
-			  (3 << MXC_CCM_CSCDR1_GPMI_PODF_OFFSET));
-
-	/* enable apbh clock gating */
-	setbits_le32(&mxc_ccm->CCGR0, MXC_CCM_CCGR0_APBHDMA_MASK);
 }
 #endif
 
@@ -713,10 +675,6 @@ int board_init(void)
 	board_qspi_init();
 #endif
 
-#ifdef CONFIG_NAND_MXS
-	setup_gpmi_nand();
-#endif
-
 	return 0;
 }
 
@@ -777,19 +735,6 @@ void board_fastboot_setup(void)
 			setenv("bootcmd", "boota mmc1");
 		break;
 #endif /*CONFIG_FASTBOOT_STORAGE_MMC*/
-#if defined(CONFIG_FASTBOOT_STORAGE_NAND)
-	case NAND_BOOT:
-		if (!getenv("fastboot_dev"))
-			setenv("fastboot_dev", "nand");
-		if (!getenv("fbparts"))
-			setenv("fbparts", ANDROID_FASTBOOT_NAND_PARTS);
-		if (!getenv("bootcmd"))
-			setenv("bootcmd",
-				"nand read ${loadaddr} ${boot_nand_offset} "
-				"${boot_nand_size};boota ${loadaddr}");
-		break;
-#endif /*CONFIG_FASTBOOT_STORAGE_NAND*/
-
 	default:
 		printf("unsupported boot devices\n");
 		break;
@@ -823,15 +768,6 @@ void board_recovery_setup(void)
 			setenv("bootcmd_android_recovery", "boota mmc1 recovery");
 		break;
 #endif /*CONFIG_FASTBOOT_STORAGE_MMC*/
-#if defined(CONFIG_FASTBOOT_STORAGE_NAND)
-	case NAND_BOOT:
-		if (!getenv("bootcmd_android_recovery"))
-			setenv("bootcmd_android_recovery",
-				"nand read ${loadaddr} ${recovery_nand_offset} "
-				"${recovery_nand_size};boota ${loadaddr}");
-		break;
-#endif /*CONFIG_FASTBOOT_STORAGE_NAND*/
-
 	default:
 		printf("Unsupported bootup device for recovery: dev: %d\n",
 			bootdev);
