@@ -237,88 +237,6 @@ static struct i2c_pads_info i2c_pad_info1 = {
 		.gp = IMX_GPIO_NR(1, 29),
 	},
 };
-
-#ifdef CONFIG_POWER
-#define I2C_PMIC       0
-int power_init_board(void)
-{
-	if (is_mx6ul_9x9_evk()) {
-		struct pmic *pfuze;
-		int ret;
-		unsigned int reg, rev_id;
-
-		ret = power_pfuze3000_init(I2C_PMIC);
-		if (ret)
-			return ret;
-
-		pfuze = pmic_get("PFUZE3000");
-		ret = pmic_probe(pfuze);
-		if (ret)
-			return ret;
-
-		pmic_reg_read(pfuze, PFUZE3000_DEVICEID, &reg);
-		pmic_reg_read(pfuze, PFUZE3000_REVID, &rev_id);
-		printf("PMIC: PFUZE3000 DEV_ID=0x%x REV_ID=0x%x\n",
-		       reg, rev_id);
-
-		/* disable Low Power Mode during standby mode */
-		pmic_reg_read(pfuze, PFUZE3000_LDOGCTL, &reg);
-		reg |= 0x1;
-		pmic_reg_write(pfuze, PFUZE3000_LDOGCTL, reg);
-
-		/* SW1B step ramp up time from 2us to 4us/25mV */
-		reg = 0x40;
-		pmic_reg_write(pfuze, PFUZE3000_SW1BCONF, reg);
-
-		/* SW1B mode to APS/PFM */
-		reg = 0xc;
-		pmic_reg_write(pfuze, PFUZE3000_SW1BMODE, reg);
-
-		/* SW1B standby voltage set to 0.975V */
-		reg = 0xb;
-		pmic_reg_write(pfuze, PFUZE3000_SW1BSTBY, reg);
-	}
-
-	return 0;
-}
-
-#ifdef CONFIG_LDO_BYPASS_CHECK
-void ldo_mode_set(int ldo_bypass)
-{
-	unsigned int value;
-	u32 vddarm;
-
-	struct pmic *p = pmic_get("PFUZE3000");
-
-	if (!p) {
-		printf("No PMIC found!\n");
-		return;
-	}
-
-	/* switch to ldo_bypass mode */
-	if (ldo_bypass) {
-		prep_anatop_bypass();
-		/* decrease VDDARM to 1.275V */
-		pmic_reg_read(p, PFUZE3000_SW1BVOLT, &value);
-		value &= ~0x1f;
-		value |= PFUZE3000_SW1AB_SETP(1275);
-		pmic_reg_write(p, PFUZE3000_SW1BVOLT, value);
-
-		set_anatop_bypass(1);
-		vddarm = PFUZE3000_SW1AB_SETP(1175);
-
-		pmic_reg_read(p, PFUZE3000_SW1BVOLT, &value);
-		value &= ~0x1f;
-		value |= vddarm;
-		pmic_reg_write(p, PFUZE3000_SW1BVOLT, value);
-
-		finish_anatop_bypass();
-
-		printf("switch to ldo_bypass mode!\n");
-	}
-}
-#endif
-#endif
 #endif
 
 int dram_init(void)
@@ -863,12 +781,8 @@ int board_late_init(void)
 #endif
 
 #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
-	setenv("board_name", "EVK");
-
-	if (is_mx6ul_9x9_evk())
-		setenv("board_rev", "9X9");
-	else
-		setenv("board_rev", "14X14");
+	setenv("board_name", "DENSOWAVE");
+	setenv("board_rev", "M30");
 #endif
 
 #ifdef CONFIG_ENV_IS_IN_MMC
@@ -882,10 +796,7 @@ int board_late_init(void)
 
 int checkboard(void)
 {
-	if (is_mx6ul_9x9_evk())
-		puts("Board: MX6UL 9x9 EVK\n");
-	else
-		puts("Board: MX6UL 14x14 EVK\n");
+	puts("Board: MX6UL 14x14 EVK\n");
 
 	return 0;
 }
