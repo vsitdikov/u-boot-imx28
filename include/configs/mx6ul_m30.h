@@ -61,7 +61,6 @@
 #endif
 
 #define CONFIG_SYS_FSL_ESDHC_ADDR	USDHC2_BASE_ADDR
-#define CONFIG_SYS_FSL_USDHC_NUM	2
 
 /* I2C configs */
 #define CONFIG_CMD_I2C
