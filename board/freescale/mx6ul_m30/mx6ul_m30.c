@@ -19,14 +19,10 @@
 #include <common.h>
 #include <fsl_esdhc.h>
 #include <i2c.h>
-#include <miiphy.h>
 #include <linux/sizes.h>
 #include <mmc.h>
 #include <mxsfb.h>
 #include <netdev.h>
-#include <power/pmic.h>
-#include <power/pfuze3000_pmic.h>
-#include "../common/pfuze.h"
 #include <usb.h>
 #include <usb/ehci-fsl.h>
 #include <asm/imx-common/video.h>
