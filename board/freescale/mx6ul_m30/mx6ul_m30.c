@@ -131,7 +131,6 @@ static struct fsl_esdhc_cfg usdhc_cfg = {
 };
 
 #define USDHC2_CD_GPIO	IMX_GPIO_NR(4, 5)
-#define USDHC2_PWR_GPIO	IMX_GPIO_NR(4, 10)
 
 int board_mmc_get_env_dev(int devno)
 {
@@ -181,9 +180,6 @@ int board_mmc_init(bd_t *bis)
 {
 #ifdef CONFIG_SPL_BUILD
 	imx_iomux_v3_setup_multiple_pads(usdhc2_pads, ARRAY_SIZE(usdhc2_pads));
-	gpio_direction_output(USDHC2_PWR_GPIO, 0);
-	udelay(500);
-	gpio_direction_output(USDHC2_PWR_GPIO, 1);
 	usdhc_cfg.sdhc_clk = mxc_get_clock(MXC_ESDHC2_CLK);
 	return fsl_esdhc_initialize(bis, &usdhc_cfg);
 #else
@@ -196,9 +192,6 @@ int board_mmc_init(bd_t *bis)
 	 * mmc1                    USDHC2
 	 */
 	imx_iomux_v3_setup_multiple_pads(usdhc2_pads, ARRAY_SIZE(usdhc2_pads));
-	gpio_direction_output(USDHC2_PWR_GPIO, 0);
-	udelay(500);
-	gpio_direction_output(USDHC2_PWR_GPIO, 1);
 	usdhc_cfg.sdhc_clk = mxc_get_clock(MXC_ESDHC2_CLK);
 
 	ret = fsl_esdhc_initialize(bis, &usdhc_cfg);
