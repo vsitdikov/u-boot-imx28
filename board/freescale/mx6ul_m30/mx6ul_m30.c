@@ -306,10 +306,6 @@ int board_init(void)
 	setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info1);
 #endif
 
-#ifdef	CONFIG_FEC_MXC
-	setup_fec(CONFIG_FEC_ENET_DEV);
-#endif
-
 #ifdef CONFIG_USB_EHCI_MX6
 	setup_usb();
 #endif
