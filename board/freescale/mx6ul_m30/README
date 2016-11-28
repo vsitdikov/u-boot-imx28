@@ -1,0 +1,21 @@
+How to use U-Boot on Densowave MX6UL M30
+-----------------------------------------------
+
+- Build U-Boot for Densowave MX6UL M30
+
+$ make mrproper
+$ make mx6ul_m30_defconfig
+$ make
+
+This will generate the SPL image called SPL and the u-boot.img.
+
+- Flash the SPL image into the micro SD card:
+
+sudo dd if=SPL of=/dev/mmcblk0 bs=1k seek=1; sync
+
+- Flash the u-boot.img image into the micro SD card:
+
+sudo dd if=u-boot.img of=/dev/mmcblk0 bs=1k seek=69; sync
+
+- Insert the micro SD card in the board, power it up and U-Boot messages should
+come up.
