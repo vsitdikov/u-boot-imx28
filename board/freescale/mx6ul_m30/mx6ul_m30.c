@@ -27,6 +27,10 @@
 #include <usb/ehci-fsl.h>
 #include <asm/imx-common/video.h>
 
+#include <power/pmic.h>
+#include <power/pfuze3000_pmic.h>
+#include "../common/pfuze.h"
+
 #ifdef CONFIG_FSL_FASTBOOT
 #include <fsl_fastboot.h>
 #endif /*CONFIG_FSL_FASTBOOT*/
@@ -66,22 +70,98 @@ DECLARE_GLOBAL_DATA_PTR;
 	PAD_CTL_PUS_47K_UP  | PAD_CTL_SPEED_LOW |		\
 	PAD_CTL_DSE_80ohm   | PAD_CTL_SRE_FAST  | PAD_CTL_HYS)
 
-#ifdef CONFIG_SYS_I2C_MXC
-#define PC MUX_PAD_CTRL(I2C_PAD_CTRL)
-/* I2C1 for PMIC and EEPROM */
-static struct i2c_pads_info i2c_pad_info1 = {
+/* I2C2 for PMIC */
+static struct i2c_pads_info i2c_pad_info2 = {
 	.scl = {
-		.i2c_mode =  MX6_PAD_UART4_TX_DATA__I2C1_SCL | PC,
-		.gpio_mode = MX6_PAD_UART4_TX_DATA__GPIO1_IO28 | PC,
-		.gp = IMX_GPIO_NR(1, 28),
+		.i2c_mode =  MX6_PAD_GPIO1_IO00__I2C2_SCL | MUX_PAD_CTRL(I2C_PAD_CTRL),
+		.gpio_mode = MX6_PAD_GPIO1_IO00__GPIO1_IO00 | MUX_PAD_CTRL(I2C_PAD_CTRL),
+		.gp = IMX_GPIO_NR(1, 0),
 	},
 	.sda = {
-		.i2c_mode = MX6_PAD_UART4_RX_DATA__I2C1_SDA | PC,
-		.gpio_mode = MX6_PAD_UART4_RX_DATA__GPIO1_IO29 | PC,
-		.gp = IMX_GPIO_NR(1, 29),
+		.i2c_mode = MX6_PAD_GPIO1_IO01__I2C2_SDA | MUX_PAD_CTRL(I2C_PAD_CTRL),
+		.gpio_mode = MX6_PAD_GPIO1_IO01__GPIO1_IO01 | MUX_PAD_CTRL(I2C_PAD_CTRL),
+		.gp = IMX_GPIO_NR(1, 1),
 	},
 };
-#endif
+
+#define I2C_PMIC 1
+int power_init_board(void)
+{
+	struct pmic *pfuze;
+	int ret;
+	unsigned int reg, rev_id;
+
+	ret = power_pfuze3000_init(I2C_PMIC);
+	if (ret)
+		return ret;
+
+	pfuze = pmic_get("PFUZE3000");
+	ret = pmic_probe(pfuze);
+	if (ret)
+		return ret;
+
+	pmic_reg_read(pfuze, PFUZE3000_DEVICEID, &reg);
+	pmic_reg_read(pfuze, PFUZE3000_REVID, &rev_id);
+	printf("PMIC: PFUZE3000 DEV_ID=0x%x REV_ID=0x%x\n",
+	       reg, rev_id);
+
+	/* disable Low Power Mode during standby mode */
+	pmic_reg_read(pfuze, PFUZE3000_LDOGCTL, &reg);
+	reg |= 0x1;
+	pmic_reg_write(pfuze, PFUZE3000_LDOGCTL, reg);
+
+	/* SW1B step ramp up time from 2us to 4us/25mV */
+	reg = 0x40;
+	pmic_reg_write(pfuze, PFUZE3000_SW1BCONF, reg);
+
+	/* SW1B mode to APS/PFM */
+	reg = 0xc;
+	pmic_reg_write(pfuze, PFUZE3000_SW1BMODE, reg);
+
+	/* SW1B standby voltage set to 0.975V */
+	reg = 0xb;
+	pmic_reg_write(pfuze, PFUZE3000_SW1BSTBY, reg);
+
+	return 0;
+}
+
+void ldo_mode_set(int ldo_bypass)
+{
+	unsigned int value;
+	u32 vddarm;
+
+	struct pmic *p = pmic_get("PFUZE3000");
+
+	if (!p) {
+		printf("No PMIC found!\n");
+		return;
+	}
+
+	/* switch to ldo_bypass mode */
+	if (ldo_bypass) {
+		printf("ldo_bypass on!\n");
+		prep_anatop_bypass();
+		/* decrease VDDARM to 1.275V */
+		pmic_reg_read(p, PFUZE3000_SW1BVOLT, &value);
+		value &= ~0x1f;
+		value |= PFUZE3000_SW1AB_SETP(1275);
+		pmic_reg_write(p, PFUZE3000_SW1BVOLT, value);
+
+		set_anatop_bypass(1);
+		vddarm = PFUZE3000_SW1AB_SETP(1175);
+
+		pmic_reg_read(p, PFUZE3000_SW1BVOLT, &value);
+		value &= ~0x1f;
+		value |= vddarm;
+		pmic_reg_write(p, PFUZE3000_SW1BVOLT, value);
+
+		finish_anatop_bypass();
+
+		printf("switch to ldo_bypass mode!\n");
+	} else {
+		printf("ERROR ldo_bypass off!\n");
+	}
+}
 
 int dram_init(void)
 {
@@ -302,11 +382,7 @@ int board_init(void)
 	/* Address of boot parameters */
 	gd->bd->bi_boot_params = PHYS_SDRAM + 0x100;
 
-#if 0
-#ifdef CONFIG_SYS_I2C_MXC
-	setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info1);
-#endif
-#endif
+	setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info2);
 
 #if 0
 #ifdef CONFIG_USB_EHCI_MX6
@@ -335,13 +411,6 @@ int checkboard(void)
 
 	return 0;
 }
-
-#ifdef CONFIG_LDO_BYPASS_CHECK
-void ldo_mode_set(int ldo_bypass)
-{
-	printf("No PMIC found!\n");
-}
-#endif
 
 #ifdef CONFIG_FSL_FASTBOOT
 void board_fastboot_setup(void)
