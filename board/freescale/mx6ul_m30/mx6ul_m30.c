@@ -258,34 +258,19 @@ int board_mmc_init(bd_t *bis)
 #define USB_OTHERREGS_OFFSET	0x800
 #define UCTRL_PWR_POL		(1 << 9)
 
-static iomux_v3_cfg_t const usb_otg_pads[] = {
-	MX6_PAD_GPIO1_IO00__ANATOP_OTG1_ID | MUX_PAD_CTRL(OTG_ID_PAD_CTRL),
-};
-
-/* At default the 3v3 enables the MIC2026 for VBUS power */
-static void setup_usb(void)
-{
-	imx_iomux_v3_setup_multiple_pads(usb_otg_pads,
-					 ARRAY_SIZE(usb_otg_pads));
-}
-
 int board_usb_phy_mode(int port)
 {
-	if (port == 1)
-		return USB_INIT_HOST;
-	else
-		return usb_phy_mode(port);
+	return USB_INIT_HOST;
 }
 
 int board_ehci_hcd_init(int port)
 {
 	u32 *usbnc_usb_ctrl;
 
-	if (port > 1)
+	if (port != 0)
 		return -EINVAL;
 
-	usbnc_usb_ctrl = (u32 *)(USB_BASE_ADDR + USB_OTHERREGS_OFFSET +
-				 port * 4);
+	usbnc_usb_ctrl = (u32 *)(USB_BASE_ADDR + USB_OTHERREGS_OFFSET);
 
 	/* Set Power polarity */
 	setbits_le32(usbnc_usb_ctrl, UCTRL_PWR_POL);
@@ -383,12 +368,6 @@ int board_init(void)
 	gd->bd->bi_boot_params = PHYS_SDRAM + 0x100;
 
 	setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info2);
-
-#if 0
-#ifdef CONFIG_USB_EHCI_MX6
-	setup_usb();
-#endif
-#endif
 
 	return 0;
 }

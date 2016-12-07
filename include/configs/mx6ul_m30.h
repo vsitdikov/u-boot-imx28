@@ -70,63 +70,64 @@
 
 #define CONFIG_SYS_MMC_IMG_LOAD_PART	1
 
-#define CONFIG_MFG_ENV_SETTINGS \
-	"mfgtool_args=setenv bootargs console=${console},${baudrate} " \
-	    CONFIG_BOOTARGS_CMA_SIZE \
-		"rdinit=/linuxrc " \
-		"g_mass_storage.stall=0 g_mass_storage.removable=1 " \
-		"g_mass_storage.file=/fat g_mass_storage.ro=1 " \
-		"g_mass_storage.idVendor=0x066F g_mass_storage.idProduct=0x37FF "\
-		"g_mass_storage.iSerialNumber=\"\" "\
-		"clk_ignore_unused "\
+#define CONFIG_TFTP_SERVERIP 192.168.78.2
+#define CONFIG_NFS_SERVERIP 192.168.78.2
+
+#define CONFIG_IPADDR 192.168.78.100
+#define CONFIG_SERVERIP CONFIG_TFTP_SERVERIP
+#define CONFIG_GATEWAYIP 192.168.78.2
+#define CONFIG_NETMASK 255.255.255.0
+
+#define CONFIG_NETBOOT_ENV_SETTINGS \
+	"netargs=" \
+		"console=ttymxc1,115200" \
+		" ignore_loglevel" \
+		" loglevel=7" \
+		" earlyprintk" \
+		" root=/dev/nfs rw" \
+		" nfsrootdebug" \
+		" nfsroot=" __stringify(CONFIG_NFS_SERVERIP) ":/opt/m30-rootfs-1,tcp,vers=3" \
+		" ip=" __stringify(CONFIG_IPADDR) ":" __stringify(CONFIG_NFS_SERVERIP) ":" __stringify(CONFIG_GATEWAYIP) ":" __stringify(CONFIG_NETMASK) ":m30" \
 		"\0" \
-	"initrd_addr=0x83800000\0" \
-	"initrd_high=0xffffffff\0" \
-	"bootcmd_mfg=run mfgtool_args;bootz ${loadaddr} ${initrd_addr} ${fdt_addr};\0" \
+	"netboot=" \
+		"usb start; " \
+		"tftp ${loadaddr} ${image}; " \
+		"tftp ${fdt_addr} ${fdt_file}; " \
+		"setenv bootargs ${netargs}; " \
+		"bootz ${loadaddr} - ${fdt_addr}" \
+		"\0"
+
+#define CONFIG_SDBOOT_ENV_SETTINGS \
+	"sdargs=" \
+		"console=ttymxc1,115200" \
+		" earlyprintk" \
+		" root=/dev/mmcblk1p2" \
+		"\0" \
+	"sdloadimage=fatload mmc 0:1 ${loadaddr} ${image}\0" \
+	"sdloadfdt=fatload mmc 0:1 ${fdt_addr} ${fdt_file}\0" \
+	"sdload=" \
+		"mmc dev 0; " \
+		"mmc rescan; " \
+		"run sdloadimage; run sdloadfdt; " \
+		"setenv bootargs ${sdargs}; " \
+		"\0"
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
-	CONFIG_MFG_ENV_SETTINGS \
 	"script=boot.scr\0" \
 	"image=zImage\0" \
+	"fdt_file=imx6ul-densowave-m30.dtb\0" \
+	"initrd_addr=0x83800000\0" \
 	"fdt_high=0xffffffff\0" \
 	"initrd_high=0xffffffff\0" \
-	"fdt_file=imx6ul-densowave-m30.dtb\0" \
 	"fdt_addr=0x83000000\0" \
 	"bootargs=console=ttymxc1,115200 earlyprintk\0" \
-	"loadimage=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${image}\0" \
-	"loadfdt=fatload mmc ${mmcdev}:${mmcpart} ${fdt_addr} ${fdt_file}\0" \
-	"netargs=setenv bootargs console=${console},${baudrate} " \
-		CONFIG_BOOTARGS_CMA_SIZE \
-		"root=/dev/nfs " \
-	"ip=dhcp nfsroot=${serverip}:${nfsroot},v3,tcp\0" \
-		"netboot=echo Booting from net ...; " \
-		"run netargs; " \
-		"if test ${ip_dyn} = yes; then " \
-			"setenv get_cmd dhcp; " \
-		"else " \
-			"setenv get_cmd tftp; " \
-		"fi; " \
-		"${get_cmd} ${image}; " \
-		"if test ${boot_fdt} = yes || test ${boot_fdt} = try; then " \
-			"if ${get_cmd} ${fdt_addr} ${fdt_file}; then " \
-				"bootz ${loadaddr} - ${fdt_addr}; " \
-			"else " \
-				"if test ${boot_fdt} = try; then " \
-					"bootz; " \
-				"else " \
-					"echo WARN: Cannot load the DT; " \
-				"fi; " \
-			"fi; " \
-		"else " \
-			"bootz; " \
-		"fi;\0" \
+	CONFIG_SDBOOT_ENV_SETTINGS \
+	CONFIG_NETBOOT_ENV_SETTINGS \
+	"\0"
 
 #define CONFIG_BOOTCOMMAND \
-	"mmc dev ${mmcdev};" \
-	"mmc dev ${mmcdev};" \
-	"mmc rescan;" \
-	"fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${image};" \
-	"fatload mmc ${mmcdev}:${mmcpart} ${fdt_addr} ${fdt_file};" \
+	"echo booting...; " \
+	"run sdload; " \
 	"bootz ${loadaddr} - ${fdt_addr}"
 
 /* Miscellaneous configurable options */
@@ -155,21 +156,12 @@
 /* FLASH and environment organization */
 #define CONFIG_SYS_NO_FLASH
 
-/* #define CONFIG_ENV_IS_IN_MMC */
 #define CONFIG_ENV_IS_NOWHERE
-
-#define CONFIG_SYS_MMC_ENV_DEV		1   /* USDHC2 */
-#define CONFIG_SYS_MMC_ENV_PART		0	/* user area */
-#define CONFIG_MMCROOT			"/dev/mmcblk1p2"  /* USDHC2 */
-
 #define CONFIG_ENV_SIZE			SZ_8K
 #define CONFIG_ENV_OFFSET		(12 * SZ_64K)
 
 /* USB Configs */
-/* #define CONFIG_CMD_USB */
-#ifdef CONFIG_CMD_USB
-#undef CONFIG_CMD_USB
-#endif
+#define CONFIG_CMD_USB
 
 #ifdef CONFIG_CMD_USB
 #define CONFIG_USB_EHCI
@@ -180,7 +172,7 @@
 #define CONFIG_USB_ETHER_ASIX
 #define CONFIG_MXC_USB_PORTSC  (PORT_PTS_UTMI | PORT_PTS_PTW)
 #define CONFIG_MXC_USB_FLAGS   0
-#define CONFIG_USB_MAX_CONTROLLER_COUNT 2
+#define CONFIG_USB_MAX_CONTROLLER_COUNT 1
 #endif
 
 #define CONFIG_IMX_THERMAL
