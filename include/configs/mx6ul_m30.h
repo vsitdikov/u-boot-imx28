@@ -120,15 +120,23 @@
 	"fdt_high=0xffffffff\0" \
 	"initrd_high=0xffffffff\0" \
 	"fdt_addr=0x83000000\0" \
+	"loadbootscript=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${script};\0" \
 	"bootargs=console=ttymxc1,115200 earlyprintk\0" \
+	"bootscript=echo Running bootscript from mmc ...; " \
+	        "source\0" \
 	CONFIG_SDBOOT_ENV_SETTINGS \
 	CONFIG_NETBOOT_ENV_SETTINGS \
 	"\0"
 
 #define CONFIG_BOOTCOMMAND \
 	"echo booting...; " \
-	"run sdload; " \
-	"bootz ${loadaddr} - ${fdt_addr}"
+	"if run loadbootscript; then " \
+	        "setenv bootargs ${sdargs}; " \
+	        "run bootscript;" \
+	"else " \
+        	"run sdload; " \
+	        "bootz ${loadaddr} - ${fdt_addr};" \
+	"fi "
 
 /* Miscellaneous configurable options */
 #define CONFIG_CMD_MEMTEST
