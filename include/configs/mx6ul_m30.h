@@ -114,13 +114,14 @@
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"script=boot.scr\0" \
+	"bootcount=0\0"\
 	"image=zImage\0" \
 	"fdt_file=imx6ul-densowave-m30.dtb\0" \
 	"initrd_addr=0x83800000\0" \
 	"fdt_high=0xffffffff\0" \
 	"initrd_high=0xffffffff\0" \
 	"fdt_addr=0x83000000\0" \
-	"loadbootscript=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${script};\0" \
+	"loadbootscript=fatload mmc 0:1 ${loadaddr} ${script};\0" \
 	"bootargs=console=ttymxc1,115200 earlyprintk\0" \
 	"bootscript=echo Running bootscript from mmc ...; " \
 	        "source\0" \
@@ -164,9 +165,11 @@
 /* FLASH and environment organization */
 #define CONFIG_SYS_NO_FLASH
 
-#define CONFIG_ENV_IS_NOWHERE
 #define CONFIG_ENV_SIZE			SZ_8K
 #define CONFIG_ENV_OFFSET		(12 * SZ_64K)
+#define CONFIG_ENV_IS_IN_MMC
+#define CONFIG_SYS_MMC_ENV_DEV 0
+
 
 /* USB Configs */
 #define CONFIG_CMD_USB
