@@ -177,6 +177,9 @@
 
 #define CONFIG_IMX_THERMAL
 
+/* Custom size for MMC partition copying buffer */
+#define CONFIG_MMCP_DATA_BUF_SIZE (4 * SZ_1M)
+
 /* Temporarily disable video */
 /* #define CONFIG_VIDEO */
 #ifdef CONFIG_VIDEO
