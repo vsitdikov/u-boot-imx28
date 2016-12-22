@@ -17,6 +17,7 @@
 #include <asm/imx-common/mxc_i2c.h>
 #include <asm/io.h>
 #include <common.h>
+#include <div64.h>
 #include <fsl_esdhc.h>
 #include <i2c.h>
 #include <linux/sizes.h>
@@ -26,6 +27,7 @@
 #include <usb.h>
 #include <usb/ehci-fsl.h>
 #include <asm/imx-common/video.h>
+#include <watchdog.h>
 
 #include <power/pmic.h>
 #include <power/pfuze3000_pmic.h>
@@ -162,6 +164,56 @@ void ldo_mode_set(int ldo_bypass)
 		printf("ERROR ldo_bypass off!\n");
 	}
 }
+
+#define WDT_FEED_PIN IMX_GPIO_NR(3, 4)
+#define WDT_ENABLE_PIN IMX_GPIO_NR(4, 19)
+
+/* Duration of WDT pulse in microseconds */
+#define WDT_PULSE_DURATION_US 1
+
+#ifdef CONFIG_WATCHDOG
+static uint64_t usec_to_tick(unsigned long usec)
+{
+	uint64_t tick = usec;
+	tick *= get_tbclk();
+	do_div(tick, 1000000);
+	return tick;
+}
+
+void watchdog_reset(void)
+{
+	uint64_t tmp;
+	static int wdt_enabled = 0;
+
+	gpio_direction_output(WDT_FEED_PIN, 1);
+
+	/* We can't call udelay() directly because the first thing it
+	does is call WATCHDOG_RESET(). So let's reimplement it.*/
+
+	tmp = get_ticks() + usec_to_tick(WDT_PULSE_DURATION_US);
+	while (get_ticks() < tmp + 1); /* do nothing */
+
+
+	gpio_direction_output(WDT_FEED_PIN, 0);
+
+	/* From the WDT control requirement doc the WD_ENABLE should be
+	*  be enabled after the first toggle of the WD */
+	if (wdt_enabled == 0) {
+		gpio_direction_output(WDT_ENABLE_PIN, 1);
+		wdt_enabled = 1;
+	}
+
+}
+
+static iomux_v3_cfg_t const wdt_pads[] = {
+	MX6_PAD_LCD_RESET__GPIO3_IO04 | MUX_PAD_CTRL(NO_PAD_CTRL),
+	MX6_PAD_CSI_VSYNC__GPIO4_IO19 | MUX_PAD_CTRL(NO_PAD_CTRL),
+};
+
+void setup_iomux_wdt(void) {
+	imx_iomux_v3_setup_multiple_pads(wdt_pads, ARRAY_SIZE(wdt_pads));
+}
+#endif
 
 int dram_init(void)
 {
@@ -359,6 +411,9 @@ int board_early_init_f(void)
 {
 	setup_iomux_uart();
 
+#ifdef CONFIG_WATCHDOG
+	setup_iomux_wdt();
+#endif
 	return 0;
 }
 
