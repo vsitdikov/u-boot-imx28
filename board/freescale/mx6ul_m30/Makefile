@@ -3,7 +3,7 @@
 # SPDX-License-Identifier:	GPL-2.0+
 #
 
-obj-y  := mx6ul_m30.o cmd_mmc_pcopy.o
+obj-y  := mx6ul_m30.o
 
 extra-$(CONFIG_USE_PLUGIN) :=  plugin.bin
 $(obj)/plugin.bin: $(obj)/plugin.o
