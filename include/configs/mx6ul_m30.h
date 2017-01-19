@@ -199,8 +199,7 @@
 #undef CONFIG_VIDEO
 #endif
 
-/*TODO: reenable this after the kernel will have wdt support*/
-/*#define CONFIG_WATCHDOG*/
+#define CONFIG_WATCHDOG
 
 #ifdef CONFIG_VIDEO
 #define CONFIG_CFB_CONSOLE
