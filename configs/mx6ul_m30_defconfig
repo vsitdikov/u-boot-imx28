@@ -2,9 +2,60 @@ CONFIG_ARM=y
 CONFIG_ARCH_MX6=y
 CONFIG_TARGET_MX6UL_M30=y
 CONFIG_SYS_EXTRA_OPTIONS="IMX_CONFIG=board/freescale/mx6ul_m30/imximage.cfg"
-CONFIG_CMD_GPIO=y
-CONFIG_CMD_DHCP=y
-CONFIG_CMD_PING=y
 CONFIG_FIT=y
 # CONFIG_FIT_VERBOSE is not set
 # CONFIG_SYS_MALLOC_CLEAR_ON_INIT is not set
+
+#
+# Info commands
+#
+# CONFIG_CMD_BDI is not set
+# CONFIG_CMD_CONSOLE is not set
+
+#
+# Boot commands
+#
+# CONFIG_CMD_BOOTD is not set
+CONFIG_CMD_BOOTM=y
+# CONFIG_CMD_ELF is not set
+# CONFIG_CMD_GO is not set
+# CONFIG_CMD_RUN is not set
+# CONFIG_CMD_IMI is not set
+# CONFIG_CMD_IMLS is not set
+# CONFIG_CMD_XIMG is not set
+
+#
+# Environment commands
+#
+# CONFIG_CMD_EXPORTENV is not set
+# CONFIG_CMD_IMPORTENV is not set
+# CONFIG_CMD_EDITENV is not set
+
+#
+# Memory commands
+#
+# CONFIG_CMD_MEMORY is not set
+# CONFIG_CMD_CRC32 is not set
+
+#
+# Device access commands
+#
+# CONFIG_CMD_DM is not set
+# CONFIG_CMD_LOADB is not set
+# CONFIG_CMD_LOADS is not set
+# CONFIG_CMD_FLASH is not set
+# CONFIG_CMD_FPGA is not set
+# CONFIG_CMD_GPIO is not set
+
+#
+# Network commands
+#
+# CONFIG_CMD_NET is not set
+# CONFIG_CMD_DHCP is not set
+# CONFIG_CMD_NFS is not set
+# CONFIG_CMD_PING is not set
+
+#
+# Misc commands
+#
+# CONFIG_CMD_MISC is not set
