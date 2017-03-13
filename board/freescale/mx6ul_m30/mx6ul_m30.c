@@ -141,7 +141,6 @@ void ldo_mode_set(int ldo_bypass)
 
 	/* switch to ldo_bypass mode */
 	if (ldo_bypass) {
-		printf("ldo_bypass on!\n");
 		prep_anatop_bypass();
 		/* decrease VDDARM to 1.275V */
 		pmic_reg_read(p, PFUZE3000_SW1BVOLT, &value);
@@ -159,7 +158,6 @@ void ldo_mode_set(int ldo_bypass)
 
 		finish_anatop_bypass();
 
-		printf("switch to ldo_bypass mode!\n");
 	} else {
 		printf("ERROR ldo_bypass off!\n");
 	}
