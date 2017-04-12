@@ -14,8 +14,7 @@
 #include "mx6_common.h"
 #include <asm/imx-common/gpio.h>
 
-/* uncomment for PLUGIN mode support */
-/* #define CONFIG_USE_PLUGIN */
+#define CONFIG_USE_PLUGIN
 
 /* uncomment for SECURE mode support */
 /* #define CONFIG_SECURE_BOOT */
