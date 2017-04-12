@@ -345,6 +345,18 @@
 	str r1, [r0, #0x78]
 	str r1, [r0, #0x7C]
 	str r1, [r0, #0x80]
+
+/* spread spectrum range = 12MHz, modulation freq = 48K */
+	ldr r0, =0x020c8000
+	ldr r1, [r0,#0x30]
+	orr r1, r1, #0x0001
+
+	ldr r1, =0x00000BB8
+	str r1, [r0,#0x60]
+
+	ldr r1, =0x05dc8006
+	str r1, [r0,#0x40]
+
 .endm
 
 .macro imx6_qos_setting
