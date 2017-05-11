@@ -251,6 +251,108 @@ static void setup_iomux_uart(void)
 	imx_iomux_v3_setup_multiple_pads(uart2_pads, ARRAY_SIZE(uart2_pads));
 }
 
+#define RELAY_PRT_RES	IMX_GPIO_NR(4, 15)
+#define RELAY_Y1_SET	IMX_GPIO_NR(4, 10)
+#define RELAY_Y1_RES	IMX_GPIO_NR(4, 9)
+#define RELAY_Y2_RES	IMX_GPIO_NR(4, 16)
+#define RELAY_Y2_SET	IMX_GPIO_NR(4, 17)
+#define RELAY_W1_SET	IMX_GPIO_NR(4, 14)
+#define RELAY_W1_RES	IMX_GPIO_NR(4, 8)
+#define RELAY_W2_RES	IMX_GPIO_NR(2, 0)
+#define RELAY_W2_SET	IMX_GPIO_NR(2, 1)
+#define RELAY_DH_RES	IMX_GPIO_NR(2, 5)
+#define RELAY_DH_SET	IMX_GPIO_NR(2, 2)
+#define RELAY_G_RES	IMX_GPIO_NR(4, 7)
+#define RELAY_G_SET	IMX_GPIO_NR(4, 6)
+#define RELAY_OB_RES	IMX_GPIO_NR(4, 11)
+#define RELAY_OB_SET	IMX_GPIO_NR(4, 18)
+#define RELAY_ACC_RES	IMX_GPIO_NR(2, 6)
+#define RELAY_ACC_SET	IMX_GPIO_NR(2, 3)
+
+
+#define RELAY_INIT_NUM	17
+const  int iRelayInitInfTbl[RELAY_INIT_NUM] = {
+    RELAY_PRT_RES,
+    RELAY_DH_RES,
+    RELAY_ACC_RES,
+    RELAY_W2_RES,
+    RELAY_W1_RES,
+    RELAY_Y2_RES,
+    RELAY_Y1_RES,
+    RELAY_G_RES,
+    RELAY_OB_RES,
+    RELAY_OB_SET,
+    RELAY_G_SET,
+    RELAY_Y1_SET,
+    RELAY_Y2_SET,
+    RELAY_W1_SET,
+    RELAY_W2_SET,
+    RELAY_DH_SET,
+    RELAY_DH_RES
+};
+
+#define RELAY_RESET_NUM		8
+const  int iRelayResetInfTbl[RELAY_RESET_NUM] = {
+    RELAY_DH_RES,
+    RELAY_ACC_RES,
+    RELAY_W2_RES,
+    RELAY_W1_RES,
+    RELAY_Y2_RES,
+    RELAY_Y1_RES,
+    RELAY_G_RES,
+    RELAY_OB_RES
+};
+
+static iomux_v3_cfg_t const relay_pads[] = {
+	MX6_PAD_NAND_CLE__GPIO4_IO15		| MUX_PAD_CTRL(NO_PAD_CTRL),	/*PROT*/
+	MX6_PAD_NAND_ALE__GPIO4_IO10 		| MUX_PAD_CTRL(NO_PAD_CTRL),	/*SET Y1*/
+	MX6_PAD_NAND_DATA07__GPIO4_IO09 	| MUX_PAD_CTRL(NO_PAD_CTRL),	/*RES Y1*/
+	MX6_PAD_CSI_MCLK__GPIO4_IO17 		| MUX_PAD_CTRL(NO_PAD_CTRL),	/*SET Y2*/
+	MX6_PAD_NAND_DQS__GPIO4_IO16 		| MUX_PAD_CTRL(NO_PAD_CTRL),	/*RES Y2*/
+	MX6_PAD_NAND_CE1_B__GPIO4_IO14 		| MUX_PAD_CTRL(NO_PAD_CTRL),	/*SET W1*/
+	MX6_PAD_NAND_DATA06__GPIO4_IO08 	| MUX_PAD_CTRL(NO_PAD_CTRL),	/*RES W1*/
+	MX6_PAD_ENET1_RX_DATA1__GPIO2_IO01	| MUX_PAD_CTRL(NO_PAD_CTRL),	/*SET W2*/
+	MX6_PAD_ENET1_RX_DATA0__GPIO2_IO00	| MUX_PAD_CTRL(NO_PAD_CTRL),	/*RES W2*/
+	MX6_PAD_ENET1_RX_EN__GPIO2_IO02		| MUX_PAD_CTRL(NO_PAD_CTRL),	/*SET DH*/
+	MX6_PAD_ENET1_TX_EN__GPIO2_IO05		| MUX_PAD_CTRL(NO_PAD_CTRL),	/*RES DH*/
+	MX6_PAD_NAND_DATA04__GPIO4_IO06		| MUX_PAD_CTRL(NO_PAD_CTRL),	/*SET G*/
+	MX6_PAD_NAND_DATA05__GPIO4_IO07		| MUX_PAD_CTRL(NO_PAD_CTRL),	/*RES G*/
+	MX6_PAD_CSI_PIXCLK__GPIO4_IO18		| MUX_PAD_CTRL(NO_PAD_CTRL),	/*SET OB*/
+	MX6_PAD_NAND_WP_B__GPIO4_IO11		| MUX_PAD_CTRL(NO_PAD_CTRL),	/*RES OB*/
+	MX6_PAD_ENET1_TX_DATA0__GPIO2_IO03	| MUX_PAD_CTRL(NO_PAD_CTRL),	/*SET ACC*/
+	MX6_PAD_ENET1_TX_CLK__GPIO2_IO06	| MUX_PAD_CTRL(NO_PAD_CTRL),	/*RES ACC*/
+};
+
+void setup_iomux_relay(void) {
+	imx_iomux_v3_setup_multiple_pads(relay_pads, ARRAY_SIZE(relay_pads));
+}
+
+void reset_relays(void) {
+	int i;
+
+	for(i = 0; i < RELAY_INIT_NUM; i++)
+	{
+		gpio_direction_output(iRelayInitInfTbl[i], 0);
+		if(i <  RELAY_INIT_NUM - 1)
+		{
+			udelay(10 * 1000);
+		}
+	}
+
+	for (i = 0; i < RELAY_RESET_NUM; i++ )
+	{
+		gpio_direction_output(iRelayResetInfTbl[i], 1);
+		udelay(20 * 1000);
+		gpio_direction_output(iRelayResetInfTbl[i], 0);
+
+		if ( i < RELAY_RESET_NUM - 1 )
+		{
+			udelay(10 * 1000);
+		}
+	}
+
+}
+
 #ifdef CONFIG_FSL_ESDHC
 static struct fsl_esdhc_cfg usdhc_cfg = {
 	USDHC2_BASE_ADDR, 0, 4,
@@ -412,6 +514,9 @@ int board_early_init_f(void)
 #ifdef CONFIG_WATCHDOG
 	setup_iomux_wdt();
 #endif
+
+	setup_iomux_relay();
+
 	return 0;
 }
 
@@ -433,7 +538,7 @@ int board_late_init(void)
 #endif
 
 	set_wdog_reset((struct wdog_regs *)WDOG1_BASE_ADDR);
-
+	reset_relays();
 	return 0;
 }
 
