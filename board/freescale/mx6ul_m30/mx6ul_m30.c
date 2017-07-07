@@ -72,6 +72,10 @@ DECLARE_GLOBAL_DATA_PTR;
 	PAD_CTL_PUS_47K_UP  | PAD_CTL_SPEED_LOW |		\
 	PAD_CTL_DSE_80ohm   | PAD_CTL_SRE_FAST  | PAD_CTL_HYS)
 
+/*from CCM_CSCDR2. source clock for LCD shall be PLL2*/
+#define LCDIF1_PRE_CLK_SEL	(1 << 17 | 1 << 16 | 1 << 15)
+#define LCDIF1_CLK_SEL		(1 << 11 | 1 << 10 | 1 << 9)
+
 /* I2C2 for PMIC */
 static struct i2c_pads_info i2c_pad_info2 = {
 	.scl = {
@@ -507,6 +511,22 @@ struct display_info_t const displays[] = {{
 size_t display_count = ARRAY_SIZE(displays);
 #endif
 
+/*
+* Enable source clock for LCD to be on PLL2. Needed it for spread spectrum clock
+*/
+static void cscdr2_init(void)
+{
+
+	unsigned int reg;
+	struct mxc_ccm_reg *ccm = (struct mxc_ccm_reg *)CCM_BASE_ADDR;
+
+	reg = readl(&ccm->cscdr2);
+	reg &= ~( (LCDIF1_PRE_CLK_SEL) | (LCDIF1_CLK_SEL) );
+
+	writel(reg, &ccm->cscdr2);
+
+}
+
 int board_early_init_f(void)
 {
 	setup_iomux_uart();
@@ -526,6 +546,8 @@ int board_init(void)
 	gd->bd->bi_boot_params = PHYS_SDRAM + 0x100;
 
 	setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info2);
+
+	cscdr2_init();
 
 	return 0;
 }
