@@ -34,7 +34,7 @@ CONFIG_CMD_RUN=y
 #
 # Memory commands
 #
-# CONFIG_CMD_MEMORY is not set
+CONFIG_CMD_MEMORY=y
 # CONFIG_CMD_CRC32 is not set
 
 #
@@ -58,4 +58,4 @@ CONFIG_CMD_RUN=y
 #
 # Misc commands
 #
-# CONFIG_CMD_MISC is not set
+CONFIG_CMD_MISC=y
