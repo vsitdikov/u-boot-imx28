@@ -90,6 +90,20 @@ static struct i2c_pads_info i2c_pad_info2 = {
 	},
 };
 
+/* I2C3 for SHT20 */
+static struct i2c_pads_info i2c_pad_info3 = {
+	.scl = {
+		.i2c_mode =  MX6_PAD_UART1_TX_DATA__I2C3_SCL | MUX_PAD_CTRL(I2C_PAD_CTRL),
+		.gpio_mode = MX6_PAD_UART1_TX_DATA__GPIO1_IO16 | MUX_PAD_CTRL(I2C_PAD_CTRL),
+		.gp = IMX_GPIO_NR(1, 16),
+	},
+	.sda = {
+		.i2c_mode = MX6_PAD_UART1_RX_DATA__I2C3_SDA | MUX_PAD_CTRL(I2C_PAD_CTRL),
+		.gpio_mode = MX6_PAD_UART1_RX_DATA__GPIO1_IO17 | MUX_PAD_CTRL(I2C_PAD_CTRL),
+		.gp = IMX_GPIO_NR(1, 17),
+	},
+};
+
 #define I2C_PMIC 1
 int power_init_board(void)
 {
@@ -546,6 +560,7 @@ int board_init(void)
 	gd->bd->bi_boot_params = PHYS_SDRAM + 0x100;
 
 	setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info2);
+	setup_i2c(2, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info3);
 
 	cscdr2_init();
 

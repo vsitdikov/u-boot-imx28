@@ -33,6 +33,8 @@ DECLARE_GLOBAL_DATA_PTR;
 #define CONFIG_SYS_MEMTEST_SCRATCH 0
 #endif
 
+#define SWAP_UINT16(x) (((x) >> 8) | ((x) << 8))
+
 static int mod_mem(cmd_tbl_t *, int, int, int, char * const []);
 
 /* Display values from last command.
@@ -157,6 +159,59 @@ static int do_mem_mm(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 static int do_mem_nm(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 {
 	return mod_mem (cmdtp, 0, flag, argc, argv);
+}
+
+static int do_mem_swap(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
+{
+	ulong length;
+	ulong	addr_src, addr_dest, count;
+	u16 writeval;
+	int	size;
+	void *buf, *start;
+	ulong bytes;
+
+	if ((argc < 3) || (argc > 4))
+		return CMD_RET_USAGE;
+	
+	/* Check for size specification.
+	*/
+	if ((size = cmd_get_data_size(argv[0], 4)) < 1)
+		return 1;
+
+	if (argc > 2)
+		length = simple_strtoul(argv[2], NULL, 16);
+
+	/* Address is specified since argc > 1
+	*/
+	addr_src = simple_strtoul(argv[1], NULL, 16);
+	addr_src += base_address;
+
+
+	bytes = size * length;
+	buf = map_sysmem(addr_src, bytes);
+
+	writeval = *((u16 *)buf);
+
+	unmap_sysmem(buf);
+
+	/*data written to memory is little endiand and we need big endian*/
+	writeval = SWAP_UINT16(writeval);
+
+	addr_dest = simple_strtoul(argv[2], NULL, 16);
+	addr_dest += base_address;
+
+	bytes = size * count;
+	start = map_sysmem(addr_dest, bytes);
+	buf = start;
+	if (size == 2)
+		*((u16 *)buf) = (u16)writeval;
+	else
+		return CMD_RET_USAGE;
+
+	buf += size;
+	unmap_sysmem(start);
+
+	return 0;
 }
 
 static int do_mem_mw(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
@@ -1281,6 +1336,12 @@ U_BOOT_CMD(
 #else
 	"[.b, .w, .l] address value [count]"
 #endif
+);
+
+U_BOOT_CMD(
+	ms,	4,	1,	do_mem_swap,
+	"memory bytes swap",
+	"[.w] address value [count]"
 );
 
 U_BOOT_CMD(
