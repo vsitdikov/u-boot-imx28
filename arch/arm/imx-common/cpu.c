@@ -30,6 +30,7 @@
 #endif
 
 #if defined(CONFIG_DISPLAY_CPUINFO)
+char *rval = "unknown";
 static u32 reset_cause = -1;
 
 static char *get_reset_cause(void)
@@ -44,35 +45,48 @@ static char *get_reset_cause(void)
 	switch (cause) {
 	case 0x00001:
 	case 0x00011:
+		rval = "POR";
 		return "POR";
 	case 0x00004:
+		rval = "CSU";
 		return "CSU";
 	case 0x00008:
+		rval = "IPP USER";
 		return "IPP USER";
 	case 0x00010:
 #ifdef	CONFIG_MX7
+		rval = "WDOG1";
 		return "WDOG1";
 #else
+		rval = "WDOG";
 		return "WDOG";
 #endif
 	case 0x00020:
+		rval = "JTAG HIGH-Z";
 		return "JTAG HIGH-Z";
 	case 0x00040:
+		rval = "JTAG SW";
 		return "JTAG SW";
 	case 0x00080:
+		rval = "WDOG3";
 		return "WDOG3";
 #ifdef CONFIG_MX7
 	case 0x00100:
+		rval = "WDOG4";
 		return "WDOG4";
 	case 0x00200:
+		rval = "TEMPSENSE";
 		return "TEMPSENSE";
 #else
 	case 0x00100:
+		rval = "TEMPSENSE";
 		return "TEMPSENSE";
 	case 0x10000:
+		rval = "WARM BOOT";
 		return "WARM BOOT";
 #endif
 	default:
+		rval = "unknown reset";
 		return "unknown reset";
 	}
 }
@@ -80,6 +94,11 @@ static char *get_reset_cause(void)
 u32 get_imx_reset_cause(void)
 {
 	return reset_cause;
+}
+
+char *get_m30_boot_reason(void)
+{
+	return rval;
 }
 #endif
 

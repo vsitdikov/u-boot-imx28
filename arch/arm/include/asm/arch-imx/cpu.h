@@ -46,3 +46,4 @@
 #define CS0_32M_CS1_32M_CS2_32M_CS3_32M		3
 
 u32 get_imx_reset_cause(void);
+char *get_m30_boot_reason(void);
