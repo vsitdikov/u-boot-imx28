@@ -157,6 +157,14 @@ unsigned imx_ddr_size(void)
 
 #if defined(CONFIG_DISPLAY_CPUINFO)
 
+char *cpu_variant = "6UL";
+
+char *get_m30_cpu_variant(void)
+{
+	return cpu_variant;
+}
+
+
 const char *get_imx_type(u32 imxtype)
 {
 	switch (imxtype) {
@@ -206,8 +214,8 @@ int print_cpuinfo(void)
 	struct udevice *thermal_dev;
 	int cpu_tmp, minc, maxc, ret;
 
-	printf("CPU:   Freescale i.MX%s rev%d.%d",
-	       get_imx_type((cpurev & 0xFF000) >> 12),
+	cpu_variant = get_imx_type((cpurev & 0xFF000) >> 12);
+	printf("CPU:   Freescale i.MX%s rev%d.%d", cpu_variant,
 	       (cpurev & 0x000F0) >> 4,
 	       (cpurev & 0x0000F) >> 0);
 	max_freq = get_cpu_speed_grade_hz();

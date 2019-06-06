@@ -573,6 +573,7 @@ int board_late_init(void)
 	setenv("board_name", "DENSOWAVE");
 	setenv("board_rev", "M30");
 #endif
+	setenv("cpu_variant", get_m30_cpu_variant());
 	setenv("boot_reason", get_m30_boot_reason());
 	set_wdog_reset((struct wdog_regs *)WDOG1_BASE_ADDR);
 	reset_relays();

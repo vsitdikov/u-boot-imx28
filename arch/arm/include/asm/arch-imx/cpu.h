@@ -47,3 +47,4 @@
 
 u32 get_imx_reset_cause(void);
 char *get_m30_boot_reason(void);
+char *get_m30_cpu_variant(void);
