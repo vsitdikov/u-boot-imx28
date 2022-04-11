@@ -17,11 +17,61 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+/* debug uart */
+static iomux_cfg_t const duart_pads[] = {
+    MX28_PAD_I2C0_SCL__DUART_RX | MXS_PAD_CTRL,
+    MX28_PAD_I2C0_SDA__DUART_TX | MXS_PAD_CTRL,
+};
+
+/* application uarts */
+static iomux_cfg_t const auart0_pads[] = {
+    MX28_PAD_AUART3_RX__AUART3_RX | MXS_PAD_CTRL,
+    MX28_PAD_AUART3_TX__AUART3_TX | MXS_PAD_CTRL,
+};
+
+static iomux_cfg_t const auart1_pads[] = {
+    MX28_PAD_AUART1_RX__AUART1_RX | MXS_PAD_CTRL,
+    MX28_PAD_AUART1_TX__AUART1_TX | MXS_PAD_CTRL,
+};
+
+static iomux_cfg_t const auart2_pads[] = {
+    MX28_PAD_AUART2_RX__AUART2_RX | MXS_PAD_CTRL,
+    MX28_PAD_AUART2_TX__AUART2_TX | MXS_PAD_CTRL,
+};
+
+static iomux_cfg_t const auart3_pads[] = {
+    MX28_PAD_AUART3_RX__AUART3_RX | MXS_PAD_CTRL,
+    MX28_PAD_AUART3_TX__AUART3_TX | MXS_PAD_CTRL,
+};
+
+static iomux_cfg_t const auart4_pads[] = {
+    MX28_PAD_SAIF0_BITCLK__AUART4_RX | MXS_PAD_CTRL,
+    MX28_PAD_SAIF0_SDATA0__AUART4_TX | MXS_PAD_CTRL,
+};
+
+static void setup_iomux_uarts(void)
+{
+    mxs_iomux_setup_multiple_pads(duart_pads, ARRAY_SIZE(duart_pads));
+
+    /* from ccardimx28.c in fct mxs_duart_gpios_init() ,they are doing some hack. add that here */
+    mxs_iomux_setup_pad(MX28_PAD_I2C0_SCL__DUART_RX);
+    /* to be reworked
+    gpio_direction_output(MX28_PAD_I2C0_SCL, 1);
+    gpio_set_value(MX28_PAD_I2C0_SCL, 1);
+
+    mxs_iomux_setup_pad(MX28_PAD_I2C0_SCL__DUART_RX);
+
+    mxs_iomux_setup_pad(MX28_PAD_I2C0_SCL__DUART_RX);
+    */
+}
+
 /*
  * Functions
  */
 int board_early_init_f(void)
 {
+    setup_iomux_uarts();
+
 	/* IO0 clock at 480MHz */
 	mxs_set_ioclk(MXC_IOCLK0, 480000);
 	/* IO1 clock at 480MHz */
@@ -57,6 +107,8 @@ int board_init(void)
 {
 	/* Adress of boot parameters */
 	gd->bd->bi_boot_params = PHYS_SDRAM_1 + 0x100;
+
+    setup_iomux_uarts();
 
 	return 0;
 }

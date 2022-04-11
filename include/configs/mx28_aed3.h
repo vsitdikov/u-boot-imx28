@@ -8,14 +8,14 @@
 
 /* Memory configuration */
 #define PHYS_SDRAM_1			0x40000000	/* Base address */
-#define PHYS_SDRAM_1_SIZE		0x40000000	/* Max 1 GB RAM */
+#define PHYS_SDRAM_1_SIZE		0x08000000	/* 128 MB */
 #define CONFIG_SYS_SDRAM_BASE		PHYS_SDRAM_1
 
 /* Environment */
 #ifndef CONFIG_ENV_IS_IN_SPI_FLASH
 #define CONFIG_ENV_SIZE			(16 * 1024)
 #else
-#define CONFIG_ENV_SIZE			(4 * 1024)
+#define CONFIG_ENV_SIZE			(8 * 1024) /* digi has put 8K. don't think this will have great impact */
 #endif
 #define CONFIG_ENV_OVERWRITE
 
