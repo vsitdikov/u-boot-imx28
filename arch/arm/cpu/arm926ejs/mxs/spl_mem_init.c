@@ -355,5 +355,5 @@ void mxs_mem_init(void)
 
 	early_delay(10000);
 
-	mxs_mem_setup_cpu_and_hbus();
+	//mxs_mem_setup_cpu_and_hbus();
 }

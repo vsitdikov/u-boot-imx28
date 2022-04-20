@@ -130,14 +130,14 @@ void mxs_common_spl_init(const uint32_t arg, const uint32_t *resptr,
 	mxs_spl_console_init();
 	debug("SPL: Serial Console Initialised\n");
 
-	mxs_power_init();
+	//mxs_power_init();
 
 	mxs_mem_init();
 	data->mem_dram_size = mxs_mem_get_size();
 
 	data->boot_mode_idx = bootmode;
 
-	mxs_power_wait_pswitch();
+	//mxs_power_wait_pswitch();
 
 	if (mxs_boot_modes[data->boot_mode_idx].boot_pads == MXS_BM_JTAG) {
 		debug("SPL: Waiting for JTAG user\n");
