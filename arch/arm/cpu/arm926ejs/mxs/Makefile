@@ -11,6 +11,11 @@ ifdef	CONFIG_SPL_BUILD
 obj-y	+= spl_boot.o spl_lradc_init.o spl_mem_init.o spl_power_init.o
 endif
 
+CFLAGS_spl_boot.o += -DDEBUG -DCONFIG_LOGLEVEL=8
+CFLAGS_spl_power_init.o += -DDEBUG -DCONFIG_LOGLEVEL=8
+CFLAGS_spl_lradc_init.o += -DDEBUG -DCONFIG_LOGLEVEL=8
+CFLAGS_spl_mem_init.o += -DDEBUG -DCONFIG_LOGLEVEL=8
+
 # Specify the target for use in elftosb call
 MKIMAGE_TARGET-$(CONFIG_MX23) = mxsimage$(CONFIG_SPL_FRAMEWORK:%=-spl).mx23.cfg
 MKIMAGE_TARGET-$(CONFIG_MX28) = mxsimage$(CONFIG_SPL_FRAMEWORK:%=-spl).mx28.cfg

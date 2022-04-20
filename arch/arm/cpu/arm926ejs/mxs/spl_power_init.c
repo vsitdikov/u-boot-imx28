@@ -906,16 +906,16 @@ static void mxs_power_configure_power_source(void)
 
 	mxs_power_setup_dcdc_clocksource();
 	mxs_src_power_init();
-
+    /*
 	if (readl(&power_regs->hw_power_sts) & POWER_STS_VDD5V_GT_VDDIO) {
 		batt_ready = mxs_is_batt_ready();
 		if (batt_ready) {
-			/* 5V source detected, good battery detected. */
+			/* 5V source detected, good battery detected.
 			mxs_batt_boot();
 		} else {
 			batt_good = mxs_is_batt_good();
 			if (!batt_good) {
-				/* 5V source detected, bad battery detected. */
+				/* 5V source detected, bad battery detected.
 				writel(LRADC_CONVERSION_AUTOMATIC,
 					&lradc_regs->hw_lradc_conversion_clr);
 				clrbits_le32(&power_regs->hw_power_battmonitor,
@@ -924,14 +924,16 @@ static void mxs_power_configure_power_source(void)
 			mxs_5v_boot();
 		}
 	} else {
-		/* 5V not detected, booting from battery. */
+		/* 5V not detected, booting from battery.
 		mxs_batt_boot();
 	}
-
+    */
 	/*
 	 * TODO: Do not switch CPU clock to PLL if we are VDD5V is sourced
 	 * from USB VBUS
 	 */
+    mxs_5v_boot();
+
 	mxs_power_clock2pll();
 
 	mxs_init_batt_bo();

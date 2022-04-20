@@ -3,6 +3,8 @@
 #ifndef __CONFIGS_MX28_ZOLL_AED3_H__
 #define __CONFIGS_MX28_ZOLL_AED3_H__
 
+//#include "digi_common.h"
+
 /* System configurations */
 #define CONFIG_MACH_TYPE	MACH_TYPE_MX28EVK
 
@@ -15,7 +17,7 @@
 #ifndef CONFIG_ENV_IS_IN_SPI_FLASH
 #define CONFIG_ENV_SIZE			(16 * 1024)
 #else
-#define CONFIG_ENV_SIZE			(8 * 1024) /* digi has put 8K. don't think this will have great impact */
+#define CONFIG_ENV_SIZE			(8 * 1024) /* 8K */
 #endif
 #define CONFIG_ENV_OVERWRITE
 

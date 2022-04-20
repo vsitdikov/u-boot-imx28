@@ -16,6 +16,10 @@
 
 #include "mxs_init.h"
 
+#define DEBUG
+#undef CONFIG_LOGLEVEL
+#define CONFIG_LOGLEVEL 8
+
 DECLARE_GLOBAL_DATA_PTR;
 static gd_t gdata __section(".data");
 #ifdef CONFIG_SPL_SERIAL_SUPPORT

@@ -39,11 +39,13 @@ int board_early_init_f(void)
 	gpio_direction_output(MX28_PAD_AUART2_RX__GPIO_3_8, 1);
 #endif
 
-	/* Power on LCD */
+	/* Power on LCD
 	gpio_direction_output(MX28_PAD_LCD_RESET__GPIO_3_30, 1);
+    */
 
-	/* Set contrast to maximum */
+	/* Set contrast to maximum
 	gpio_direction_output(MX28_PAD_PWM2__GPIO_3_18, 1);
+    */
 
 	return 0;
 }
@@ -78,7 +80,7 @@ int board_mmc_init(bd_t *bis)
 	gpio_direction_input(MX28_PAD_SSP1_SCK__GPIO_2_12);
 
 	/* Configure MMC0 Power Enable */
-	gpio_direction_output(MX28_PAD_PWM3__GPIO_3_28, 0);
+	//gpio_direction_output(MX28_PAD_PWM3__GPIO_3_28, 0);
 
 	return mxsmmc_initialize(bis, 0, mx28evk_mmc_wp, NULL);
 }
@@ -97,7 +99,7 @@ int board_eth_init(bd_t *bis)
 	if (ret)
 		return ret;
 
-	/* MX28EVK uses ENET_CLK PAD to drive FEC clock */
+	/* MX28_ZOLL_AED3 uses ENET_CLK PAD to drive FEC clock */
 	writel(CLKCTRL_ENET_TIME_SEL_RMII_CLK | CLKCTRL_ENET_CLK_OUT_EN,
 	       &clkctrl_regs->hw_clkctrl_enet);
 
