@@ -17,11 +17,21 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+/* debug uart */
+static iomux_cfg_t const duart_pads[] = {
+    MX28_PAD_I2C0_SCL__DUART_RX | (MXS_PAD_4MA | MXS_PAD_3V3 | MXS_PAD_PULLUP),
+    MX28_PAD_I2C0_SDA__DUART_TX | MXS_PAD_CTRL,
+};
+
 /*
  * Functions
  */
 int board_early_init_f(void)
 {
+    printf("board eary init \n");
+    mxs_iomux_setup_multiple_pads(duart_pads, ARRAY_SIZE(duart_pads));
+    mxs_duart_gpios_init();
+
 	/* IO0 clock at 480MHz */
 	mxs_set_ioclk(MXC_IOCLK0, 480000);
 	/* IO1 clock at 480MHz */
@@ -47,7 +57,18 @@ int board_early_init_f(void)
 	gpio_direction_output(MX28_PAD_PWM2__GPIO_3_18, 1);
     */
 
+
 	return 0;
+}
+
+void mxs_duart_gpios_init(void)
+{
+    printf(">>mxs_duart_gpios_init\n");
+    mxs_iomux_setup_pad(MX28_PAD_I2C0_SCL__GPIO_3_24);
+    gpio_direction_output(MX28_PAD_I2C0_SCL__GPIO_3_24, 1);
+    gpio_set_value(MX28_PAD_I2C0_SCL__GPIO_3_24, 1);
+
+    mxs_iomux_setup_pad(MX28_PAD_I2C0_SCL__DUART_RX);
 }
 
 int dram_init(void)
@@ -57,6 +78,10 @@ int dram_init(void)
 
 int board_init(void)
 {
+    printf("board init \n");
+    mxs_iomux_setup_multiple_pads(duart_pads, ARRAY_SIZE(duart_pads));
+    mxs_duart_gpios_init();
+    printf("board_init 0");
 	/* Adress of boot parameters */
 	gd->bd->bi_boot_params = PHYS_SDRAM_1 + 0x100;
 

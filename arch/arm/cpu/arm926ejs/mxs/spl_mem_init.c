@@ -191,25 +191,25 @@ static void mxs_mem_setup_cpu_and_hbus(void)
 	writeb(19 & CLKCTRL_FRAC_FRAC_MASK,
 		(uint8_t *)&clkctrl_regs->hw_clkctrl_frac0[CLKCTRL_FRAC0_CPU]);
 
-	/* Set CPU bypass */
+	/* Set CPU bypass 
 	writel(CLKCTRL_CLKSEQ_BYPASS_CPU,
 		&clkctrl_regs->hw_clkctrl_clkseq_set);
 
-	/* HBUS = 151MHz */
+	/* HBUS = 151MHz
 	writel(CLKCTRL_HBUS_DIV_MASK, &clkctrl_regs->hw_clkctrl_hbus_set);
 	writel(((~3) << CLKCTRL_HBUS_DIV_OFFSET) & CLKCTRL_HBUS_DIV_MASK,
 		&clkctrl_regs->hw_clkctrl_hbus_clr);
 
 	early_delay(10000);
 
-	/* CPU clock divider = 1 */
+	/* CPU clock divider = 1 
 	clrsetbits_le32(&clkctrl_regs->hw_clkctrl_cpu,
 			CLKCTRL_CPU_DIV_CPU_MASK, 1);
 
-	/* Disable CPU bypass */
+	/* Disable CPU bypass
 	writel(CLKCTRL_CLKSEQ_BYPASS_CPU,
 		&clkctrl_regs->hw_clkctrl_clkseq_clr);
-
+    */
 	early_delay(15000);
 }
 
@@ -355,5 +355,5 @@ void mxs_mem_init(void)
 
 	early_delay(10000);
 
-	/*mxs_mem_setup_cpu_and_hbus();*/
+	mxs_mem_setup_cpu_and_hbus();
 }

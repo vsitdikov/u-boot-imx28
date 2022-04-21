@@ -134,7 +134,7 @@ void mxs_common_spl_init(const uint32_t arg, const uint32_t *resptr,
 	mxs_spl_console_init();
 	debug("SPL: Serial Console Initialised\n");
 
-	/*mxs_power_init();*/
+	mxs_power_init();
 
 	mxs_mem_init();
 	data->mem_dram_size = mxs_mem_get_size();

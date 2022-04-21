@@ -1244,7 +1244,7 @@ void mxs_power_init(void)
 	mxs_ungate_power();
 
 	mxs_power_clock2xtal();
-	mxs_power_set_auto_restart();
+/*	mxs_power_set_auto_restart();
 	mxs_power_set_linreg();
 	mxs_power_setup_5v_detect();
 
@@ -1270,6 +1270,7 @@ void mxs_power_init(void)
 	writel(POWER_5VCTRL_PWDN_5VBRNOUT, &power_regs->hw_power_5vctrl_set);
 
 	early_delay(1000);
+*/
 }
 
 #ifdef	CONFIG_SPL_MXS_PSWITCH_WAIT
